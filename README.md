@@ -1,4 +1,4 @@
-# Enterprise RAG Benchmark
+# Enterprise RAG Workbench
 
 This project explores how enterprise-style RAG (Retrieval-Augmented Generation) systems are built in practice.
 
