@@ -2,22 +2,26 @@ from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
-persistent_directory = "db/chroma_db"  # where the embeddings live 
+persistent_directory = "db/chroma_db"  # Points to the saved Chroma DB(has stored vectors + metadata)
 
 # Load embeddings and vector store
-embedding_model = OpenAIEmbeddings(model="text-embedding-3-small") # the model should be same as previous one
+embedding_model = OpenAIEmbeddings(model="text-embedding-3-small") 
+   #we should use the same embedding model we used when we created the DB
 
+# Loading the existing vector store   
 db = Chroma(
     persist_directory=persistent_directory,
-    embedding_function=embedding_model,
+    embedding_function=embedding_model, # knows how to embed user query
     collection_metadata={"hnsw:space": "cosine"}  #algo: cosin similarity
 )
 
 # Search for relevant documents
 query = "How much did Microsoft pay to acquire GitHub?"
 
+#Creating a retriever (top-k search)
 retriever = db.as_retriever(search_kwargs={"k": 5}) 
 # its going to retrieve the top 5 chunks with highes similarity scores to the user's query embedding 
 
@@ -26,10 +30,13 @@ retriever = db.as_retriever(search_kwargs={"k": 5})
 #     search_kwargs={
 #         "k": 5,
 #         "score_threshold": 0.3  # Only return chunks with cosine similarity ≥ 0.3
+#            # prevents garbage context and helps reduce hallucinations later
 #     }
 # )
 
+# Actually retrieves the docs
 relevant_docs = retriever.invoke(query)
+ # Each doc has: doc.page_content: (chunk) && doc.metadata: (source file path, and any other metadata we stored)
 
 print(f"User Query: {query}")
 # Display results
