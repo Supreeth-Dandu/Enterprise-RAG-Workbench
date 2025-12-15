@@ -4,21 +4,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-persistent_directory = "db/chroma_db"
+persistent_directory = "db/chroma_db"  # where the embeddings live 
 
 # Load embeddings and vector store
-embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+embedding_model = OpenAIEmbeddings(model="text-embedding-3-small") # the model should be same as previous one
 
 db = Chroma(
     persist_directory=persistent_directory,
     embedding_function=embedding_model,
-    collection_metadata={"hnsw:space": "cosine"}  
+    collection_metadata={"hnsw:space": "cosine"}  #algo: cosin similarity
 )
 
 # Search for relevant documents
 query = "How much did Microsoft pay to acquire GitHub?"
 
-retriever = db.as_retriever(search_kwargs={"k": 5})
+retriever = db.as_retriever(search_kwargs={"k": 5}) 
+# its going to retrieve the top 5 chunks with highes similarity scores to the user's query embedding 
 
 # retriever = db.as_retriever(
 #     search_type="similarity_score_threshold",
